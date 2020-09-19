@@ -1,9 +1,11 @@
 import os
 
+
 def create_key(template, outtype=('nii.gz',), annotation_classes=None):
     if template is None or not template:
         raise ValueError('Template must be a valid format string')
     return template, outtype, annotation_classes
+
 
 def infotodict(seqinfo):
     """Heuristic evaluator for determining which runs belong where
@@ -14,14 +16,16 @@ def infotodict(seqinfo):
     subject: participant id
     seqitem: run number during scanning
     subindex: sub index within group
-    session: ses-[sessionID]
-    bids_subject_session_dir: BIDS subject/session directory
-    bids_subject_session_prefix: BIDS subject/session prefix
     """
 
     data = create_key('run{item:03d}')
+<<<<<<< Updated upstream
 
     info = {data: []}
+=======
+    info = {data: []}
+    last_run = len(seqinfo)
+>>>>>>> Stashed changes
 
     for s in seqinfo:
         """
@@ -46,6 +50,7 @@ def infotodict(seqinfo):
         * study_description
         * referring_physician_name
         * series_description
+<<<<<<< Updated upstream
         * sequence_name
         * image_type
         * accession_number
@@ -55,5 +60,10 @@ def infotodict(seqinfo):
         * series_uid
 
         """
+=======
+        * image_type
+        """
+
+>>>>>>> Stashed changes
         info[data].append(s.series_id)
     return info
