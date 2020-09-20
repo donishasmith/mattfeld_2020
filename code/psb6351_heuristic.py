@@ -19,13 +19,8 @@ def infotodict(seqinfo):
     """
 
     data = create_key('run{item:03d}')
-<<<<<<< Updated upstream
-
-    info = {data: []}
-=======
     info = {data: []}
     last_run = len(seqinfo)
->>>>>>> Stashed changes
 
     for s in seqinfo:
         """
@@ -50,20 +45,9 @@ def infotodict(seqinfo):
         * study_description
         * referring_physician_name
         * series_description
-<<<<<<< Updated upstream
-        * sequence_name
-        * image_type
-        * accession_number
-        * patient_age
-        * patient_sex
-        * date
-        * series_uid
-
-        """
-=======
         * image_type
         """
 
->>>>>>> Stashed changes
         info[data].append(s.series_id)
     return info
+
