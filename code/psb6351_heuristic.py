@@ -18,8 +18,26 @@ def infotodict(seqinfo):
     subindex: sub index within group
     """
 
-    data = create_key('run{item:03d}')
-    info = {data: []}
+    #subject
+    #item : each sun
+    #type: fmri or dwi
+    #index: ROI 1 or 2, study task: 1,2,3,4
+    #dir: AP or PA
+
+    t1w = create_key('sub-{subject}/ses-1/anat/sub-{subject}_ses-1_run-{item}_T1w')
+    dwi = create_key('sub-{subject}/ses-1/dwi/sub-{subject}_ses-1_run-{item}_dwi')
+    study_task =  create_key('sub-{subject}/ses-1/func/sub-{subject}_ses-1_task-study-{index}_run-{item}_bold')
+    distortion = create_key('sub-{subject}/ses-1/fmap/sub-{subject}_ses-1_acq-{type}_dist_dir-{dir}_run-{item}_epi')
+    roi_task = create_key('sub-{subject}/ses-1/func/sub-{subject}_ses-1_task-ROI-loc-{index}_run-{item}_bold')
+
+
+    info = {t1w : [],
+        dwi : [],
+        study_task :  [],
+        distortion : [],
+        roi_task : []
+        }
+
     last_run = len(seqinfo)
 
     for s in seqinfo:
@@ -48,6 +66,32 @@ def infotodict(seqinfo):
         * image_type
         """
 
-        info[data].append(s.series_id)
-    return info
 
+        if ("T1w" in s[12]):
+            info[t1w].append({"item": s.series_id})
+        elif ("Study_1" in s[12]):
+            info[study_task].append({"index":"1",  "item": s.series_id})
+        elif ("Study_2" in s[12]):
+            info[study_task].append({"index":"2",  "item": s.series_id})
+        elif ("Study_3" in s[12]):
+            info[study_task].append({"index":"3",  "item": s.series_id})
+        elif ("Study_4" in s[12]):
+            info[study_task].append({"index":"4",  "item": s.series_id})
+        elif ("dMRI_AP_REVL" in s[12]):
+            info[dwi].append({"item": s.series_id})
+        elif ("fMRI_REVL_ROI_loc_1" in s[12]):
+            info[roi_task].append({"index":"1", "item": s.series_id})
+        elif ("fMRI_REVL_ROI_loc_2" in s[12]):
+            info[roi_task].append({"index":"2", "item": s.series_id})
+        elif ("fMRI_DistortionMap_PA" in s[12]):
+            info[distortion].append({"type": "fMRI", "dir":"PA", "item": s.series_id}) 
+        elif ("fMRI_DistortionMap_AP" in s[12]):
+            info[distortion].append({"type": "fMRI", "dir":"AP", "item": s.series_id}) 
+        elif ("dMRI_DistortionMap_PA_dMRI_REV" in s[12]):
+            info[distortion].append({"type": "dwi", "dir":"PA", "item": s.series_id}) 
+        elif ("dMRI_DistortionMap_AP_dMRI_REV" in s[12]):
+            info[distortion].append({"type": "dwi", "dir":"AP", "item": s.series_id}) 
+        else:
+            pass
+            
+    return info
