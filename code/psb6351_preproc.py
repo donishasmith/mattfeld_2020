@@ -125,7 +125,7 @@ for curr_json in func_json: # Here I am iterating over the variable func_json th
 # Code here become less python specific and more nipype specific.  They share similarites
 # but have some unique pecularities to take note.
 psb6351_wf = pe.Workflow(name='psb6351_wf') # First I create a workflow...this will serve as the backbone of the pipeline
-psb6351_wf.base_dir = work_dir + f'/psb6351workdir/sub-{sid[0]}' # I deinfe the working directory where I want preliminary files to be written
+psb6351_wf.base_dir = work_dir + f'/psb6351workdir/sub-{sids[0]}' # I deinfe the working directory where I want preliminary files to be written
 psb6351_wf.config['execution']['use_relative_paths'] = True # I assign a execution variable to use relative paths...TRYING TO USE THIS TO FIX A BUG?
 
 # Create a Function node to substitute names of files created during pipeline
@@ -229,9 +229,13 @@ fs_register = pe.Node(fs.BBRegister(init='fsl'),
                       name ='fs_register')
 fs_register.inputs.contrast_type = 't2'
 fs_register.inputs.out_fsl_file = True
-fs_register.inputs.subject_id = f'sub-{sid[0]}'
+fs_register.inputs.subject_id = f'sub-{sids[0]}'
 fs_register.inputs.subjects_dir = fs_dir
 psb6351_wf.connect(extractref, 'roi_file', fs_register, 'source_file')
+
+# Add a mapnode to spatially blur the data
+# save the outputs to the datasink
+
 
 # Below is the node that collects all the data and saves
 # the outputs that I am interested in. Here in this node
@@ -239,7 +243,7 @@ psb6351_wf.connect(extractref, 'roi_file', fs_register, 'source_file')
 # function to get rid of nesting
 datasink = pe.Node(nio.DataSink(), name="datasink")
 datasink.inputs.base_directory = os.path.join(base_dir, 'derivatives/preproc')
-datasink.inputs.container = f'sub-{sid[0]}'
+datasink.inputs.container = f'sub-{sids[0]}'
 psb6351_wf.connect(tshifter, 'out_file', datasink, 'sltime_corr')
 psb6351_wf.connect(extractref, 'roi_file', datasink, 'study_ref')
 psb6351_wf.connect(calc_distor_corr, 'source_warp', datasink, 'distortion')
