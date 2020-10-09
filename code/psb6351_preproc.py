@@ -14,7 +14,7 @@
 # The directory where these files are written must be created before otherwise
 # you won't have access to the output and error text files.
 
-#SBATCH --partition centos7_16C_48G
+#SBATCH --partition centos7_default-partition
 #SBATCH --account acc_psb6351
 #SBATCH --qos pq_psb6351
 #SBATCH -o /scratch/madlab/Mattfeld_PSB6351/crash/preproc_o
@@ -61,7 +61,7 @@ sids = ['021']
 # I am also using f string formatting to insert the first element of the 
 # sids list variable into the string.
 base_dir = '/home/data/madlab/Mattfeld_PSB6351/mattfeld_2020'
-work_dir = '/scratch/madlab/Mattfeld_PSB6351'
+work_dir = '/scratch/madlab/Mattfeld_PSB6351_today'
 func_dir = os.path.join(base_dir, f'dset/sub-{sids[0]}/func')
 fmap_dir = os.path.join(base_dir, f'dset/sub-{sids[0]}/fmap')
 fs_dir = os.path.join(base_dir, 'derivatives', 'freesurfer')
@@ -242,7 +242,7 @@ psb6351_wf.connect(extractref, 'roi_file', fs_register, 'source_file')
 # I use the substitutions input combined with the earlier
 # function to get rid of nesting
 datasink = pe.Node(nio.DataSink(), name="datasink")
-datasink.inputs.base_directory = os.path.join(base_dir, 'derivatives/preproc')
+datasink.inputs.base_directory = os.path.join(base_dir, 'derivatives/preproc1')
 datasink.inputs.container = f'sub-{sids[0]}'
 psb6351_wf.connect(tshifter, 'out_file', datasink, 'sltime_corr')
 psb6351_wf.connect(extractref, 'roi_file', datasink, 'study_ref')
@@ -258,6 +258,6 @@ psb6351_wf.connect(getsubs, 'subs', datasink, 'substitutions')
 # The following two lines set a work directory outside of my 
 # local git repo and runs the workflow
 psb6351_wf.run(plugin='SLURM',
-               plugin_args={'sbatch_args': ('--partition centos7_IB_44C_512G --qos pq_psb6351 --account acc_psb6351'),
+               plugin_args={'sbatch_args': ('--partition centos7_default-partition --qos pq_psb6351 --account acc_psb6351'),
                             'overwrite':True})
 
